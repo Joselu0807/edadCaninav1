@@ -23,7 +23,7 @@ Al terminar sabrás:
 
 1. Haz un **fork** de este repositorio (botón *Fork*) y clona tu fork:
    ```bash
-   git clone https://github.com/TU_USUARIO/edadCaninav1.git
+   git clone [https://github.com/TU_USUARIO/edadCaninav1.git](https://github.com/TU_USUARIO/edadCaninav1.git)
    ```
 2. Ábrelo en Android Studio y ejecútalo en el emulador.
 
@@ -33,15 +33,16 @@ Antes de arreglar nada, comprueba qué falla. Prueba estas entradas y anota qué
 
 | Entrada | ¿Qué ocurre? |
 |---|---|
-| *(campo vacío)* | |
-| `abc` | |
-| `3.5` | |
-| `0` | |
-| `-4` | |
-| `99999999999` | |
-| `400000000` | |
+| *(campo vacío)* | La app se cierra (`NumberFormatException`) al intentar convertir una cadena vacía a entero. |
+| `abc` | La app se cierra (`NumberFormatException`) porque las letras no se pueden convertir a entero. |
+| `3.5` | La app se cierra (`NumberFormatException`) porque el punto decimal no es un entero válido. |
+| `0` | Calcula 0 * 7 = 0. No da error, pero el resultado es ilógico para una edad. |
+| `-4` | Calcula -4 * 7 = -28. No da error, pero da un resultado negativo absurdo. |
+| `99999999999` | La app se cierra (`NumberFormatException`) por superar el límite máximo de memoria de un `int`. |
+| `400000000` | No se cierra, pero da un número negativo o absurdo por desbordamiento de memoria al multiplicar por 7. |
 
-> 💡 Cuando la app se cierre, abre el **Logcat** y busca la excepción. ¿Qué método la lanza? ¿Por qué el último caso no cierra la app pero da un resultado absurdo?
+> 💡 **¿Qué método lanza la excepción y por qué el último caso no cierra la app?** 
+> La excepción la lanza `Integer.parseInt()`. El último caso no cierra la app porque el número introducido sí cabe en un `int`, pero al multiplicarse por 7 supera el límite máximo (`Integer.MAX_VALUE`), provocando un desbordamiento que devuelve un valor erróneo.
 
 ## Paso 2 · Crea la rama de trabajo
 
@@ -71,7 +72,8 @@ En `res/values/strings.xml` añade tres textos nuevos:
 <string name="error_rango">La edad debe estar entre %1$d y %2$d años</string>
 ```
 
-> ❓ ¿Qué significan `%1$d` y `%2$d`? ¿En qué orden se rellenan?
+> ❓ **¿Qué significan `%1$d` y `%2$d`? ¿En qué orden se rellenan?**
+> **Respuesta:** Son comodines para variables de tipo entero (`d`). `%1$d` se rellena con el primer parámetro que le pasemos (`EDAD_MINIMA`) y `%2$d` con el segundo (`EDAD_MAXIMA`), respetando ese mismo orden posicional.
 
 ## Paso 5 · Restringe la entrada desde el layout
 
@@ -121,7 +123,8 @@ ageEdit = findViewById(R.id.age_input);
 resultText = findViewById(R.id.result_text);
 ```
 
-> ❓ ¿Qué pasaría si dejaras `EditText ageEdit = findViewById(...)` dentro de `onCreate()`?
+> ❓ **¿Qué pasaría si dejaras `EditText ageEdit = findViewById(...)` dentro de `onCreate()`?**
+> **Respuesta:** Se crearía una variable local que solo existiría dentro del `onCreate()`. El atributo global `ageEdit` se quedaría vacío (`null`), y al usar el botón para llamar a `calcularEdad()`, la app se cerraría de golpe con un error `NullPointerException`.
 
 ## Paso 8 · Saca la lógica del botón a un método
 
@@ -156,7 +159,8 @@ Implementa el método siguiendo este orden. En cuanto algo falle, llama a `mostr
    ```
 5. **Todo correcto**: quita el error del campo (`setError(null)`), calcula `age * FACTOR_CANINO` y muestra el resultado con `tu_edad_format`.
 
-> ❓ ¿Por qué limitar la edad a 30 evita también el desbordamiento que viste en el Paso 1?
+> ❓ **¿Por qué limitar la edad a 30 evita también el desbordamiento que viste en el Paso 1?**
+> **Respuesta:** Porque al restringir la entrada a 30, la multiplicación máxima será 30 * 7 = 210. Este número es tan pequeño que es imposible que desborde la capacidad máxima de una variable `int` en Java (más de 2 mil millones).
 
 ## Paso 11 · Vuelve a probar
 
@@ -170,7 +174,8 @@ Comprueba que **la app nunca se cierra**:
 | `1` | "Si tu perro fuera humano tendría 7 años" |
 | `30` | "Si tu perro fuera humano tendría 210 años" |
 
-> 💡 Con el teclado numérico no puedes escribir `abc` ni `-4`. ¿Cómo comprobarías que el `try/catch` funciona? (Pista: quita `inputType` un momento.)
+> 💡 **¿Cómo comprobarías que el `try/catch` funciona? (Pista: quita `inputType` un momento.)**
+> **Respuesta:** Borrando temporalmente la línea `android:inputType="number"` en el archivo `activity_main.xml`. De esta manera, el teclado nos permitiría escribir letras como `abc` y podríamos comprobar que salta el aviso de error controlado en vez de cerrarse la aplicación.
 
 ## Paso 12 · Guarda y sube tu trabajo
 
@@ -186,8 +191,8 @@ Comprueba en GitHub que tu fork tiene ahora dos ramas: `main` y `v2-validacion`.
 
 ## ✅ Lista de comprobación
 
-- [ ] La app no se cierra con ninguna entrada.
-- [ ] Todos los textos están en `strings.xml` (ningún aviso *Hardcoded string*).
-- [ ] No quedan números mágicos en `MainActivity`.
-- [ ] `onCreate()` solo prepara la pantalla; la lógica está en `calcularEdad()`.
-- [ ] El trabajo está en la rama `v2-validacion`, no en `main`.
+- [x] La app no se cierra con ninguna entrada.
+- [x] Todos los textos están en `strings.xml` (ningún aviso *Hardcoded string*).
+- [x] No quedan números mágicos en `MainActivity`.
+- [x] `onCreate()` solo prepara la pantalla; la lógica está en `calcularEdad()`.
+- [x] El trabajo está en la rama `v2-validacion`, no en `main`.
