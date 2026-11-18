@@ -1,9 +1,8 @@
 package es.davante.edadcanina;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import androidx.databinding.DataBindingUtil;
+import es.davante.edadcanina.databinding.ActivityMainBinding;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,33 +14,27 @@ public class MainActivity extends AppCompatActivity {
     private static final int EDAD_MINIMA = 1;
     private static final int EDAD_MAXIMA = 30;
 
-    private EditText ageEdit;
-    private TextView resultText;
+    // Objeto generado por DataBinding para acceder a las vistas sin findViewById
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-
-        // Declaramos variables
-         ageEdit = findViewById(R.id.age_input);
-         resultText = findViewById(R.id.result_text);
-        Button button1 = findViewById(R.id.btn_calc);
-
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         // Implementar el boton (setOnClickListener)
-        button1.setOnClickListener(view -> calcularEdad());
+        binding.btnCalc.setOnClickListener(view -> calcularEdad());
     } // <-- Esta llave cierra el onCreate()
 
     private void mostrarError(String mensaje) {
-        ageEdit.setError(mensaje);
-        ageEdit.requestFocus();
-        resultText.setText("");
+        binding.ageInput.setError(mensaje);
+        binding.ageInput.requestFocus();
+        binding.resultText.setText("");
     }
 
     private void calcularEdad() {
-        String ageString = ageEdit.getText().toString().trim();
+        String ageString =binding.ageInput.getText().toString().trim();
 
         if (ageString.isEmpty()) {
             mostrarError(getString(R.string.error_vacio));
@@ -61,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        ageEdit.setError(null);
+        binding.ageInput.setError(null);
         int result = age * FACTOR_CANINO;
-        resultText.setText(getString(R.string.tu_edad_format, result));
+        binding.resultText.setText(getString(R.string.tu_edad_format, result));
     }
 }
