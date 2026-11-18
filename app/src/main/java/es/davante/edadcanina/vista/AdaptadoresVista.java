@@ -6,6 +6,8 @@ import androidx.databinding.BindingAdapter;
 import es.davante.edadcanina.R;
 import es.davante.edadcanina.modelo.EdadCaninaModelo;
 import es.davante.edadcanina.modelo.Validacion;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 
 // Creo esta clase dentro del paquete vista para traducir los estados del modelo
 // a mensajes visuales sin ensucian ni el modelo ni la Activity.
@@ -50,5 +52,32 @@ public final class AdaptadoresVista {
         if (mensaje != null) {
             campo.requestFocus();
         }
+    }
+    // Interfaz sencilla para enlazar la tecla Listo del teclado desde el XML sin tocar la Activity
+    public interface AlPulsarListo {
+        void onListo();
+    }
+
+    // Este adaptador captura la tecla de acción del teclado (actionDone), oculta el teclado
+    // y lanza el cálculo en el controlador igual que si pulsara el botón Calcular.
+    @BindingAdapter("alPulsarListo")
+    public static void configurarTeclaListo(EditText campo, AlPulsarListo accion) {
+        if (accion == null) {
+            campo.setOnEditorActionListener(null);
+            return;
+        }
+
+        campo.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                accion.onListo();
+                InputMethodManager imm = (InputMethodManager) v.getContext()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+                return true;
+            }
+            return false;
+        });
     }
 }

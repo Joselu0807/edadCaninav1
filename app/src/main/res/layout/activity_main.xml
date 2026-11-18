@@ -62,6 +62,9 @@
         android:importantForAutofill="no"
         android:text="@={modelo.edadTexto}"
         app:errorValidacion="@{modelo.validacion}"
+        android:imeOptions="actionDone"
+        app:alPulsarListo="@{() -> controlador.onCalcularClick()}"
+
         />
 
  <TextView
