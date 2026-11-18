@@ -76,4 +76,27 @@ public class EdadCaninaModeloTest {
         assertEquals(Validacion.SIN_CALCULAR, modelo.getValidacion());
         assertEquals(0, modelo.getEdadHumana());
     }
-}
+    @Test
+        public void calcular_avisaALosObservadoresCuandoCambianLosDatos() {
+            final boolean[] avisoEdad = {false};
+            final boolean[] avisoValidacion = {false};
+
+            // Me suscribo al modelo igual que hace DataBinding por debajo para comprobar que notifica
+            modelo.addOnPropertyChangedCallback(new androidx.databinding.Observable.OnPropertyChangedCallback() {
+                @Override
+                public void onPropertyChanged(androidx.databinding.Observable sender, int propertyId) {
+                    if (propertyId == es.davante.edadcanina.BR.edadHumana) {
+                        avisoEdad[0] = true;
+                    } else if (propertyId == es.davante.edadcanina.BR.validacion) {
+                        avisoValidacion[0] = true;
+                    }
+                }
+            });
+
+            modelo.setEdadTexto("6");
+            modelo.calcular();
+
+            assertTrue(avisoEdad[0]);
+            assertTrue(avisoValidacion[0]);
+        }
+    }

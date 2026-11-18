@@ -23,40 +23,34 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         modelo = new EdadCaninaModelo();
+// Conecto el modelo con el binding para que la vista observe sus cambios sola
+        binding.setModelo(modelo);
 
-        // Implementar el boton (setOnClickListener)
         binding.btnCalc.setOnClickListener(view -> {
-            modelo.setEdadTexto(binding.ageInput.getText().toString());
             Validacion validacion = modelo.calcular();
-            pintarResultado(validacion);
+            pintarErrorTemporal(validacion);
         });
+
     } // <-- Esta llave cierra el onCreate()
 
-    private void mostrarError(String mensaje) {
-        binding.ageInput.setError(mensaje);
-        binding.ageInput.requestFocus();
-        binding.resultText.setText("");
-    }
-
     // Traduzco el estado que me devuelve el modelo al texto correspondiente en pantalla
-    private void pintarResultado(Validacion validacion) {
+    // Pinto solo el error del EditText de forma temporal hasta moverlo al XML en el siguiente paso
+    private void pintarErrorTemporal(Validacion validacion) {
         switch (validacion) {
-            case OK:
-                binding.ageInput.setError(null);
-                binding.resultText.setText(getString(R.string.tu_edad_format, modelo.getEdadHumana()));
-                break;
             case VACIO:
-                mostrarError(getString(R.string.error_vacio));
+                binding.ageInput.setError(getString(R.string.error_vacio));
+                binding.ageInput.requestFocus();
                 break;
             case NO_NUMERICO:
-                mostrarError(getString(R.string.error_no_numero));
+                binding.ageInput.setError(getString(R.string.error_no_numero));
+                binding.ageInput.requestFocus();
                 break;
             case FUERA_DE_RANGO:
-                mostrarError(getString(R.string.error_rango, EdadCaninaModelo.EDAD_MINIMA, EdadCaninaModelo.EDAD_MAXIMA));
+                binding.ageInput.setError(getString(R.string.error_rango, EdadCaninaModelo.EDAD_MINIMA, EdadCaninaModelo.EDAD_MAXIMA));
+                binding.ageInput.requestFocus();
                 break;
             default:
                 binding.ageInput.setError(null);
-                binding.resultText.setText("");
                 break;
         }
     }
